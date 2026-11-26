@@ -1,0 +1,26 @@
+<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex"><title>Admin</title>
+<style>body{font-family:system-ui,sans-serif;max-width:640px;margin:0 auto;padding:20px;background:#faf6ee;color:#333}input{display:block;width:100%;box-sizing:border-box;margin:8px 0;padding:11px;font-size:16px;border:1px solid #c9a95c;border-radius:8px}button{padding:10px 24px;font-size:16px;border:0;border-radius:8px;background:#c9a95c;color:#fff}.c{background:#fff;border:1px solid #e5d7b0;border-radius:10px;padding:12px;margin:10px 0}.c b{display:block}.c small{color:#888}#err{color:#b00}</style></head><body>
+<h2>الإهداءات</h2>
+<div id="login"><input id="u" placeholder="username" autocomplete="username" dir="ltr"><input id="p" type="password" placeholder="password" autocomplete="current-password" dir="ltr"><button id="go">دخول</button><p id="err"></p></div>
+<div id="list" hidden><p><span id="cnt"></span> <button id="out" style="float:left;background:#888">خروج</button></p><div id="items"></div></div>
+<script>
+var SB_URL="https://fglvwsalhsyybxhqdsio.supabase.co",SB_KEY="sb_publishable_U-qZjSpuC0Huwnoe_939tw_T9v90ECc",EMAIL_DOMAIN="invitation.example.com";
+var tok=sessionStorage.getItem('t');
+function $(i){return document.getElementById(i)}
+async function load(){
+ var r=await fetch(SB_URL+'/rest/v1/dedications?select=name,message,created_at&order=created_at.desc',{headers:{apikey:SB_KEY,Authorization:'Bearer '+tok}});
+ if(!r.ok){sessionStorage.removeItem('t');tok=null;$('login').hidden=false;$('list').hidden=true;return}
+ var a=await r.json();$('login').hidden=true;$('list').hidden=false;$('cnt').textContent='العدد: '+a.length;
+ var box=$('items');box.textContent='';
+ a.forEach(function(x){var c=document.createElement('div');c.className='c';var b=document.createElement('b');b.textContent=x.name;var p=document.createElement('div');p.textContent=x.message;p.style.whiteSpace='pre-wrap';var s=document.createElement('small');s.textContent=new Date(x.created_at).toLocaleString('ar-EG');c.append(b,p,s);box.append(c)});
+}
+$('go').onclick=async function(){
+ $('err').textContent='';
+ var u=$('u').value.trim().toLowerCase(),email=u.indexOf('@')>0?u:u+'@'+EMAIL_DOMAIN;
+ var r=await fetch(SB_URL+'/auth/v1/token?grant_type=password',{method:'POST',headers:{apikey:SB_KEY,'Content-Type':'application/json'},body:JSON.stringify({email:email,password:$('p').value})});
+ if(!r.ok){$('err').textContent='بيانات غلط';return}
+ tok=(await r.json()).access_token;sessionStorage.setItem('t',tok);$('p').value='';load();
+};
+$('out').onclick=function(){sessionStorage.removeItem('t');location.reload()};
+if(tok)load();
+</script></body></html>
