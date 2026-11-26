@@ -11,7 +11,8 @@ function sync(){b.className=a.paused?"off":"on"}
 function play(){var p=a.play();if(p&&p.catch)p.catch(function(){});setTimeout(sync,100)}
 b.addEventListener("click",function(e){e.stopPropagation();if(a.paused){userPaused=false;play()}else{userPaused=true;a.pause();sync()}});
 a.addEventListener("play",sync);a.addEventListener("pause",sync);
-function first(e){if(e&&e.target===b)return;if(!userPaused&&a.paused)play();["pointerdown","touchend","click","keydown"].forEach(function(n){document.removeEventListener(n,first,true)})}
-["pointerdown","touchend","click","keydown"].forEach(function(n){document.addEventListener(n,first,true)});
+function first(e){if(e&&e.target===b)return;if(userPaused)return;if(a.paused){var p=a.play();if(p&&p.then)p.then(function(){done()}).catch(function(){});else done()}else done()}
+function done(){sync();["touchend","click","keydown"].forEach(function(n){document.removeEventListener(n,first,true)})}
+["touchend","click","keydown"].forEach(function(n){document.addEventListener(n,first,true)});
 play();
 })();
