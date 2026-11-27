@@ -1,0 +1,23 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//AhmedMalak Wedding//Invitation//AR
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+BEGIN:VEVENT
+UID:ahmed-malak-wedding-20270313@ekaa2010.github.io
+DTSTAMP:20261127T123000Z
+DTSTART:20270313T173000Z
+DTEND:20270313T210000Z
+SUMMARY:زفاف أحمد وملك
+LOCATION:قاعة الفيولا، جاردينيا هاوس، دار ا
+ لحرب الكيمياوية
+DESCRIPTION:حفل زفاف أحمد وملك — قاعة الفيولا
+ ، جاردينيا هاوس، دار الحرب الكيمياوية\n
+ الاتجاهات: https://maps.app.goo.gl/rtf6iDrqN2i3c9RQ9?g_st=aw
+BEGIN:VALARM
+TRIGGER:-P1D
+ACTION:DISPLAY
+DESCRIPTION:تذكير: زفاف أحمد وملك غدًا
+END:VALARM
+END:VEVENT
+END:VCALENDAR
