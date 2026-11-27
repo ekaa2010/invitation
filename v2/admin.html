@@ -1,0 +1,31 @@
+<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex"><title>الإهداءات — أحمد وملك</title>
+<style>body{font-family:'Amiri',system-ui,serif;max-width:640px;margin:0 auto;padding:20px;background:#f5edda;color:#5e4623}h2{text-align:center;color:#a97c2e;margin:10px 0 18px}input{display:block;width:100%;box-sizing:border-box;margin:8px 0;padding:11px 12px;font-size:16px;border:1px solid #c9a95c;border-radius:10px;background:rgba(255,255,255,.75);color:#333}button{padding:10px 24px;font-size:16px;border:1px solid #a97c2e;border-radius:999px;background:linear-gradient(100deg,#8a621f,#c9a049 55%,#a97c2e);color:#fff;cursor:pointer}.c{background:#fffdf6;border:1px solid #e5d7b0;border-radius:10px;padding:12px 14px;margin:10px 0;box-shadow:0 2px 8px rgba(120,90,40,.08)}.c b{display:block;color:#a97c2e;font-size:18px}.c small{color:#99855a}#err{color:#b00;text-align:center}.bar{display:flex;align-items:center;gap:10px}.bar span{font-weight:700}#out{background:#8a7a52;border-color:#8a7a52;margin-inline-start:auto;padding:7px 18px;font-size:14px}#login{max-width:360px;margin:30px auto}</style></head><body>
+<h2>الإهداءات — أحمد وملك</h2>
+<div id="login"><input id="u" placeholder="username" autocomplete="username" dir="ltr"><input id="p" type="password" placeholder="password" autocomplete="current-password" dir="ltr"><button id="go" style="width:100%">دخول</button><p id="err"></p></div>
+<div id="list" hidden><div class="bar"><span id="cnt"></span><button id="out">خروج</button></div><input id="q" placeholder="ابحث بالاسم أو كلمة في الإهداء"><div id="items"></div></div>
+<script>
+var SB_URL="https://fglvwsalhsyybxhqdsio.supabase.co",SB_KEY="sb_publishable_U-qZjSpuC0Huwnoe_939tw_T9v90ECc",EMAIL_DOMAIN="invitation.example.com";
+var tok=sessionStorage.getItem('t'),all=[];
+function $(i){return document.getElementById(i)}
+function render(){
+ var q=$('q').value.trim(),box=$('items');box.textContent='';
+ var a=all.filter(function(x){return !q||x.name.indexOf(q)>-1||x.message.indexOf(q)>-1});
+ $('cnt').textContent='العدد: '+all.length+(q?' — المعروض: '+a.length:'');
+ a.forEach(function(x){var c=document.createElement('div');c.className='c';var b=document.createElement('b');b.textContent=x.name;var p=document.createElement('div');p.textContent=x.message;p.style.whiteSpace='pre-wrap';var s=document.createElement('small');s.textContent=new Date(x.created_at).toLocaleString('ar-EG');c.append(b,p,s);box.append(c)});
+}
+async function load(){
+ var r=await fetch(SB_URL+'/rest/v1/dedications?select=name,message,created_at&order=created_at.desc',{headers:{apikey:SB_KEY,Authorization:'Bearer '+tok}});
+ if(!r.ok){sessionStorage.removeItem('t');tok=null;$('login').hidden=false;$('list').hidden=true;return}
+ all=await r.json();$('login').hidden=true;$('list').hidden=false;render();
+}
+$('q').oninput=render;
+$('go').onclick=async function(){
+ $('err').textContent='';
+ var u=$('u').value.trim().toLowerCase(),email=u.indexOf('@')>0?u:u+'@'+EMAIL_DOMAIN;
+ var r=await fetch(SB_URL+'/auth/v1/token?grant_type=password',{method:'POST',headers:{apikey:SB_KEY,'Content-Type':'application/json'},body:JSON.stringify({email:email,password:$('p').value})});
+ if(!r.ok){$('err').textContent='بيانات غلط';return}
+ tok=(await r.json()).access_token;sessionStorage.setItem('t',tok);$('p').value='';load();
+};
+$('out').onclick=function(){sessionStorage.removeItem('t');location.reload()};
+if(tok)load();
+</script></body></html>
